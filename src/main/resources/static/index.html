@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarePlan</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 240px;
+            background: #172554;
+            color: white;
+            padding: 30px 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        .nav-btn {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 9px;
+            background: transparent;
+            color: white;
+            text-align: left;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover,
+        .nav-btn.active {
+            background: #2563eb;
+        }
+
+        /* MAIN */
+
+        .main {
+            flex: 1;
+            padding: 35px;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        /* DASHBOARD CARDS */
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card h3 {
+            color: #6b7280;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .card-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #172554;
+        }
+
+        /* SECTIONS */
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .section {
+            background: white;
+            padding: 28px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+            margin-bottom: 25px;
+        }
+
+        .section h2 {
+            margin-bottom: 22px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+        }
+
+        button.action {
+            margin-top: 18px;
+            padding: 13px 22px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button.action:hover {
+            background: #1d4ed8;
+        }
+
+        /* TABLE */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        .status-taken {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .status-missed {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #15803d;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+
+        .back-btn {
+            margin-bottom: 20px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #e5e7eb;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard,
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+            .dashboard,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            CarePlan
+        </div>
+
+        <button class="nav-btn active" onclick="showScreen('home', this)">
+            Dashboard
+        </button>
+
+        <button class="nav-btn" onclick="showScreen('patients', this)">
+            Patients
+        </button>
+
+        <button class="nav-btn" onclick="showScreen('medicines', this)">
+            Medicines
+        </button>
+
+        <button class="nav-btn" onclick="showScreen('schedules', this)">
+            Schedules
+        </button>
+
+        <button class="nav-btn" onclick="showScreen('doses', this)">
+            Dose Logs
+        </button>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <div class="header">
+            <h1>CarePlan</h1>
+            <p>Medication Management Dashboard</p>
+        </div>
+
+
+        <!-- DASHBOARD -->
+
+        <div id="home" class="screen active">
+
+            <div class="dashboard">
+
+                <div class="card" onclick="showScreenById('patients')">
+                    <h3>Patients</h3>
+                    <div class="card-number" id="patientCount">0</div>
+                </div>
+
+                <div class="card" onclick="showScreenById('medicines')">
+                    <h3>Medicines</h3>
+                    <div class="card-number" id="medicineCount">0</div>
+                </div>
+
+                <div class="card" onclick="showScreenById('schedules')">
+                    <h3>Schedules</h3>
+                    <div class="card-number" id="scheduleCount">0</div>
+                </div>
+
+                <div class="card" onclick="showScreenById('doses')">
+                    <h3>Dose Logs</h3>
+                    <div class="card-number" id="doseCount">0</div>
+                </div>
+
+            </div>
+
+            <div class="section">
+
+                <h2>Welcome to CarePlan</h2>
+
+                <p>
+                    Manage patients, medicines, medication schedules
+                    and dose tracking from one place.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- PATIENT SCREEN -->
+
+        <div id="patients" class="screen">
+
+            <button class="back-btn" onclick="showScreenById('home')">
+                ← Dashboard
+            </button>
+
+            <div class="section">
+
+                <h2>Add Patient</h2>
+
+                <div class="form-grid">
+
+                    <input
+                            type="text"
+                            id="patientName"
+                            placeholder="Patient Name"
+                            autocomplete="off">
+
+                    <input
+                            type="number"
+                            id="patientAge"
+                            placeholder="Age"
+                            autocomplete="off">
+
+                    <input
+                            type="text"
+                            id="patientContact"
+                            placeholder="Contact Number"
+                            autocomplete="off">
+
+                </div>
+
+                <button class="action" onclick="addPatient()">
+                    Add Patient
+                </button>
+
+                <p id="patientResult" class="result"></p>
+
+            </div>
+
+
+            <div class="section">
+
+                <h2>Saved Patients</h2>
+
+                <table>
+
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Contact</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="patientTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- MEDICINE SCREEN -->
+
+        <div id="medicines" class="screen">
+
+            <button class="back-btn" onclick="showScreenById('home')">
+                ← Dashboard
+            </button>
+
+            <div class="section">
+
+                <h2>Add Medicine</h2>
+
+                <div class="form-grid">
+
+                    <input
+                            type="text"
+                            id="medicineName"
+                            placeholder="Medicine Name"
+                            autocomplete="off">
+
+                    <input
+                            type="text"
+                            id="medicineDosage"
+                            placeholder="Dosage"
+                            autocomplete="off">
+
+                    <select id="medicinePatient">
+                        <option value="">
+                            Select Patient
+                        </option>
+                    </select>
+
+                </div>
+
+                <button class="action" onclick="addMedicine()">
+                    Add Medicine
+                </button>
+
+                <p id="medicineResult" class="result"></p>
+
+            </div>
+
+
+            <div class="section">
+
+                <h2>Saved Medicines</h2>
+
+                <table>
+
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Medicine</th>
+                        <th>Dosage</th>
+                        <th>Patient ID</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="medicineTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- SCHEDULE SCREEN -->
+
+        <div id="schedules" class="screen">
+
+            <button class="back-btn" onclick="showScreenById('home')">
+                ← Dashboard
+            </button>
+
+            <div class="section">
+
+                <h2>Add Schedule</h2>
+
+                <div class="form-grid">
+
+                    <select id="scheduleMedicine">
+                        <option value="">
+                            Select Medicine
+                        </option>
+                    </select>
+
+                    <input
+                            type="text"
+                            id="scheduleTime"
+                            placeholder="Time e.g. 08:00 AM"
+                            autocomplete="off">
+
+                </div>
+
+                <button class="action" onclick="addSchedule()">
+                    Add Schedule
+                </button>
+
+                <p id="scheduleResult" class="result"></p>
+
+            </div>
+
+
+            <div class="section">
+
+                <h2>Saved Schedules</h2>
+
+                <table>
+
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Medicine ID</th>
+                        <th>Time</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="scheduleTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- DOSE SCREEN -->
+
+        <div id="doses" class="screen">
+
+            <button class="back-btn" onclick="showScreenById('home')">
+                ← Dashboard
+            </button>
+
+            <div class="section">
+
+                <h2>Record Dose</h2>
+
+                <div class="form-grid">
+
+                    <select id="doseSchedule">
+                        <option value="">
+                            Select Schedule
+                        </option>
+                    </select>
+
+                    <select id="doseStatus">
+
+                        <option value="TAKEN">
+                            TAKEN
+                        </option>
+
+                        <option value="MISSED">
+                            MISSED
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <button class="action" onclick="addDoseLog()">
+                    Save Dose
+                </button>
+
+                <p id="doseResult" class="result"></p>
+
+            </div>
+
+
+            <div class="section">
+
+                <h2>Previous Dose Logs</h2>
+
+                <table>
+
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Schedule ID</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="doseTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script>
+
+
+    /* SCREEN NAVIGATION */
+
+    function showScreen(id, button) {
+
+        document.querySelectorAll(".screen")
+            .forEach(screen => screen.classList.remove("active"));
+
+        document.getElementById(id)
+            .classList.add("active");
+
+        document.querySelectorAll(".nav-btn")
+            .forEach(btn => btn.classList.remove("active"));
+
+        if (button) {
+            button.classList.add("active");
+        }
+
+        loadAllData();
+    }
+
+
+    function showScreenById(id) {
+
+        document.querySelectorAll(".screen")
+            .forEach(screen => screen.classList.remove("active"));
+
+        document.getElementById(id)
+            .classList.add("active");
+
+        document.querySelectorAll(".nav-btn")
+            .forEach(btn => btn.classList.remove("active"));
+    }
+
+
+    /* LOAD ALL DATA */
+
+    function loadAllData() {
+
+        loadPatients();
+        loadMedicines();
+        loadSchedules();
+        loadDoseLogs();
+
+    }
+
+
+    /* PATIENTS */
+
+    function loadPatients() {
+
+        fetch("/patients")
+            .then(response => response.json())
+            .then(data => {
+
+                document.getElementById("patientCount")
+                    .innerText = data.length;
+
+                const table =
+                    document.getElementById("patientTable");
+
+                const select =
+                    document.getElementById("medicinePatient");
+
+                table.innerHTML = "";
+
+                select.innerHTML =
+                    '<option value="">Select Patient</option>';
+
+                data.forEach(patient => {
+
+                    table.innerHTML += `
+                    <tr>
+                        <td>${patient.id}</td>
+                        <td>${patient.name}</td>
+                        <td>${patient.age}</td>
+                        <td>${patient.contactNumber}</td>
+                    </tr>
+                `;
+
+                    select.innerHTML += `
+                    <option value="${patient.id}">
+                        ${patient.name}
+                    </option>
+                `;
+
+                });
+
+            });
+
+    }
+
+
+    /* MEDICINES */
+
+    function loadMedicines() {
+
+        fetch("/medicines")
+            .then(response => response.json())
+            .then(data => {
+
+                document.getElementById("medicineCount")
+                    .innerText = data.length;
+
+                const table =
+                    document.getElementById("medicineTable");
+
+                const select =
+                    document.getElementById("scheduleMedicine");
+
+                table.innerHTML = "";
+
+                select.innerHTML =
+                    '<option value="">Select Medicine</option>';
+
+                data.forEach(medicine => {
+
+                    table.innerHTML += `
+                    <tr>
+                        <td>${medicine.id}</td>
+                        <td>${medicine.medicineName}</td>
+                        <td>${medicine.dosage}</td>
+                        <td>${medicine.patientId}</td>
+                    </tr>
+                `;
+
+                    select.innerHTML += `
+                    <option value="${medicine.id}">
+                        ${medicine.medicineName}
+                    </option>
+                `;
+
+                });
+
+            });
+
+    }
+
+
+    /* SCHEDULES */
+
+    function loadSchedules() {
+
+        fetch("/schedules")
+            .then(response => response.json())
+            .then(data => {
+
+                document.getElementById("scheduleCount")
+                    .innerText = data.length;
+
+                const table =
+                    document.getElementById("scheduleTable");
+
+                const select =
+                    document.getElementById("doseSchedule");
+
+                table.innerHTML = "";
+
+                select.innerHTML =
+                    '<option value="">Select Schedule</option>';
+
+                data.forEach(schedule => {
+
+                    table.innerHTML += `
+                    <tr>
+                        <td>${schedule.id}</td>
+                        <td>${schedule.medicineId}</td>
+                        <td>${schedule.time}</td>
+                    </tr>
+                `;
+
+                    select.innerHTML += `
+                    <option value="${schedule.id}">
+                        Schedule ${schedule.id} - ${schedule.time}
+                    </option>
+                `;
+
+                });
+
+            });
+
+    }
+
+
+    /* DOSE LOGS */
+
+    function loadDoseLogs() {
+
+        fetch("/dose-logs")
+            .then(response => response.json())
+            .then(data => {
+
+                document.getElementById("doseCount")
+                    .innerText = data.length;
+
+                const table =
+                    document.getElementById("doseTable");
+
+                table.innerHTML = "";
+
+                data.forEach(dose => {
+
+                    const statusClass =
+                        dose.status === "TAKEN"
+                            ? "status-taken"
+                            : "status-missed";
+
+                    table.innerHTML += `
+                    <tr>
+                        <td>${dose.id}</td>
+                        <td>${dose.scheduleId}</td>
+                        <td class="${statusClass}">
+                            ${dose.status}
+                        </td>
+                    </tr>
+                `;
+
+                });
+
+            });
+
+    }
+
+
+    /* ADD PATIENT */
+
+    function addPatient() {
+
+        const name =
+            document.getElementById("patientName").value.trim();
+
+        const age =
+            Number(document.getElementById("patientAge").value);
+
+        const contactNumber =
+            document.getElementById("patientContact").value.trim();
+
+
+        if (!name || !age || !contactNumber) {
+
+            showResult(
+                "patientResult",
+                "Please fill all fields.",
+                false
+            );
+
+            return;
+        }
+
+
+        fetch("/patients", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                name: name,
+                age: age,
+                contactNumber: contactNumber
+            })
+
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                showResult(
+                    "patientResult",
+                    "Patient added successfully. ID: " + data.id,
+                    true
+                );
+
+                document.getElementById("patientName").value = "";
+                document.getElementById("patientAge").value = "";
+                document.getElementById("patientContact").value = "";
+
+                loadAllData();
+
+            });
+
+    }
+
+
+    /* ADD MEDICINE */
+
+    function addMedicine() {
+
+        const medicineName =
+            document.getElementById("medicineName").value.trim();
+
+        const dosage =
+            document.getElementById("medicineDosage").value.trim();
+
+        const patientId =
+            document.getElementById("medicinePatient").value;
+
+
+        if (!medicineName || !dosage || !patientId) {
+
+            showResult(
+                "medicineResult",
+                "Please fill all fields.",
+                false
+            );
+
+            return;
+        }
+
+
+        fetch("/medicines", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                medicineName: medicineName,
+                dosage: dosage,
+                patientId: Number(patientId)
+            })
+
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                showResult(
+                    "medicineResult",
+                    "Medicine added successfully. ID: " + data.id,
+                    true
+                );
+
+                document.getElementById("medicineName").value = "";
+                document.getElementById("medicineDosage").value = "";
+
+                loadAllData();
+
+            });
+
+    }
+
+
+    /* ADD SCHEDULE */
+
+    function addSchedule() {
+
+        const medicineId =
+            document.getElementById("scheduleMedicine").value;
+
+        const time =
+            document.getElementById("scheduleTime").value.trim();
+
+
+        if (!medicineId || !time) {
+
+            showResult(
+                "scheduleResult",
+                "Please fill all fields.",
+                false
+            );
+
+            return;
+        }
+
+
+        fetch("/schedules", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                medicineId: Number(medicineId),
+                time: time
+            })
+
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                showResult(
+                    "scheduleResult",
+                    "Schedule added successfully. ID: " + data.id,
+                    true
+                );
+
+                document.getElementById("scheduleTime").value = "";
+
+                loadAllData();
+
+            });
+
+    }
+
+
+    /* ADD DOSE */
+
+    function addDoseLog() {
+
+        const scheduleId =
+            document.getElementById("doseSchedule").value;
+
+        const status =
+            document.getElementById("doseStatus").value;
+
+
+        if (!scheduleId) {
+
+            showResult(
+                "doseResult",
+                "Please select a schedule.",
+                false
+            );
+
+            return;
+        }
+
+
+        fetch("/dose-logs", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                scheduleId: Number(scheduleId),
+                status: status
+            })
+
+        })
+            .then(response => {
+
+                if (!response.ok) {
+                    return response.text().then(message => {
+                        throw new Error(message);
+                    });
+                }
+
+                return response.json();
+
+            })
+            .then(data => {
+
+                showResult(
+                    "doseResult",
+                    "Dose saved successfully. ID: " + data.id,
+                    true
+                );
+
+                loadAllData();
+
+            })
+            .catch(error => {
+
+                showResult(
+                    "doseResult",
+                    error.message,
+                    false
+                );
+
+            });
+
+    }
+
+
+    /* RESULT MESSAGE */
+
+    function showResult(id, message, success) {
+
+        const element =
+            document.getElementById(id);
+
+        element.innerText = message;
+
+        element.className =
+            success
+                ? "result success"
+                : "result error";
+
+    }
+
+
+    /* INITIAL LOAD */
+
+    loadAllData();
+
+</script>
+
+</body>
+</html>
